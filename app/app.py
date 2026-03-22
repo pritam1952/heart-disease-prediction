@@ -1,30 +1,33 @@
 import os
-import pickle
+import numpy as np
 import pandas as pd
+import pickle
 from flask import Flask, request, render_template
-from tensorflow.keras.models import load_model
 
-# ------------------ Flask app ------------------
 app = Flask(__name__)
 
-# ------------------ Paths ------------------
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-MODEL_PATH = os.path.join(BASE_DIR, 'results', 'best_model.keras')
-PREPROCESSOR_PATH = os.path.join(BASE_DIR, 'results', 'preprocessor.pkl')
+BASE_DIR    = os.path.dirname(os.path.abspath(__file__))
+ROOT_DIR    = os.path.dirname(BASE_DIR)
+RESULTS_DIR = os.path.join(ROOT_DIR, 'results')
 
-# ------------------ Load model & preprocessor ------------------
-try:
-    model = load_model(MODEL_PATH)
-except Exception as e:
-    raise FileNotFoundError(f"Model not found at {MODEL_PATH}") from e
+# Lazy loading — load once on first request
+_model  = None
+_scaler = None
 
-try:
-    with open(PREPROCESSOR_PATH, 'rb') as f:
-        preprocessor = pickle.load(f)
-except Exception as e:
-    raise FileNotFoundError(f"Preprocessor not found at {PREPROCESSOR_PATH}") from e
+def get_model():
+    global _model
+    if _model is None:
+        from tensorflow.keras.models import load_model
+        _model = load_model(os.path.join(RESULTS_DIR, 'best_model.keras'))
+    return _model
 
-# ------------------ Feature columns ------------------
+def get_scaler():
+    global _scaler
+    if _scaler is None:
+        with open(os.path.join(RESULTS_DIR, 'scaler.pkl'), 'rb') as f:
+            _scaler = pickle.load(f)
+    return _scaler
+
 FEATURE_COLUMNS = [
     'age', 'sex', 'cp', 'trestbps', 'chol', 'fbs',
     'restecg', 'thalach', 'exang', 'oldpeak',
@@ -32,75 +35,61 @@ FEATURE_COLUMNS = [
     'age_group', 'high_chol', 'high_bp', 'hr_ratio'
 ]
 
-# ------------------ Preprocessing function ------------------
+
 def preprocess_input(form):
-    # Safely get form values
-    def safe_float(key, default=0):
-        try:
-            return float(form.get(key, default))
-        except ValueError:
-            return default
+    age      = float(form['age'])
+    trestbps = float(form['trestbps'])
+    chol     = float(form['chol'])
+    thalach  = float(form['thalach'])
 
-    age      = safe_float('age')
-    trestbps = safe_float('trestbps')
-    chol     = safe_float('chol')
-    thalach  = safe_float('thalach')
-
-    # Derived features
     age_group = 0 if age < 40 else 1 if age < 50 else 2 if age < 60 else 3
-    high_chol = 1 if chol >= 240 else 0
+    high_chol = 1 if chol     >= 240 else 0
     high_bp   = 1 if trestbps >= 140 else 0
-    hr_ratio  = round(thalach / (220 - age), 3) if (220 - age) != 0 else 0
+    hr_ratio  = round(thalach / (220 - age), 3)
 
-    # Create DataFrame for preprocessor
     features = pd.DataFrame([[
         age,
-        safe_float('sex'),
-        safe_float('cp'),
+        float(form['sex']),
+        float(form['cp']),
         trestbps,
         chol,
-        safe_float('fbs'),
-        safe_float('restecg'),
+        float(form['fbs']),
+        float(form['restecg']),
         thalach,
-        safe_float('exang'),
-        safe_float('oldpeak'),
-        safe_float('slope'),
-        safe_float('ca'),
-        safe_float('thal'),
-        age_group,
-        high_chol,
-        high_bp,
-        hr_ratio
+        float(form['exang']),
+        float(form['oldpeak']),
+        float(form['slope']),
+        float(form['ca']),
+        float(form['thal']),
+        age_group, high_chol, high_bp, hr_ratio
     ]], columns=FEATURE_COLUMNS)
 
-    # Transform features using preprocessor
-    return preprocessor.transform(features)
+    return get_scaler().transform(features)
 
-# ------------------ Routes ------------------
+
 @app.route('/')
 def index():
     return render_template('index.html')
 
+
 @app.route('/predict', methods=['POST'])
 def predict():
-    try:
-        features = preprocess_input(request.form)
-        probability = float(model.predict(features).flatten()[0])
-        prediction = int(probability >= 0.5)
+    features    = preprocess_input(request.form)
+    probability = float(get_model().predict(features).flatten()[0])
+    prediction  = int(probability >= 0.5)
 
-        result = {
-            'label'      : 'Heart Disease Detected' if prediction == 1 else 'No Heart Disease',
-            'probability': round(probability * 100, 2),
-            'risk'       : 'High Risk'   if probability >= 0.7
-                            else 'Medium Risk' if probability >= 0.4
-                            else 'Low Risk',
-            'prediction' : prediction
-        }
+    result = {
+        'label'      : 'Heart Disease Detected' if prediction == 1 else 'No Heart Disease',
+        'probability': round(probability * 100, 2),
+        'risk'       : 'High Risk'   if probability >= 0.7
+                  else 'Medium Risk' if probability >= 0.4
+                  else 'Low Risk',
+        'prediction' : prediction
+    }
 
-        return render_template('result.html', result=result, form=request.form)
-    except Exception as e:
-        return f"Error processing input: {e}", 400
+    return render_template('result.html', result=result, form=request.form)
 
-# ------------------ Run ------------------
+
 if __name__ == '__main__':
-    app.run(debug=True)
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port, debug=False)
