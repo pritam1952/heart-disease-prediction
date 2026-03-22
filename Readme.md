@@ -39,6 +39,10 @@ heart-disease-prediction/
 │   │   └── result.html
 │   └── static/
 │       └── style.css
+├── assets/
+│   ├── roc_curve.png
+│   ├── confusion_matrix.png
+│   └── prediction_distribution.png
 ├── data/
 │   └── heart.csv
 ├── notebooks/
@@ -145,43 +149,23 @@ Actual  No  |     29      |       3       |
 | ⚠️ False Positive (FP) | 3 | Healthy predicted as Diseased |
 | ❌ False Negative (FN) | 9 | Diseased predicted as Healthy |
 
+![Confusion Matrix](assets/confusion_matrix.png)
+
 ---
 
 ### ROC Curve
 
-```
-AUC = 0.855
+> AUC = 0.855 — Model has **85.5% ability** to distinguish between diseased and healthy patients.
 
-1.0 |  **
-    | *
-0.8 |*
-    |*
-0.6 |*
-    | *
-0.4 |   *
-    |      *
-0.2 |           *
-    |                  *
-0.0 |__________________________
-    0.0  0.2  0.4  0.6  0.8  1.0
-         False Positive Rate
-```
-
-> AUC = 0.855 means the model has **85.5% ability** to distinguish between diseased and healthy patients.
+![ROC Curve](assets/roc_curve.png)
 
 ---
 
 ### Prediction Probability Distribution
 
-```
-Threshold = 0.5
+> Green = No Disease | Red = Heart Disease | Threshold = 0.5
 
-Below 0.5 → No Disease predicted  (Green)
-Above 0.5 → Heart Disease predicted (Red)
-
-No Disease  peaks around 0.2 – 0.4  ✅
-Heart Disease peaks around 0.6 – 0.8 ✅
-```
+![Prediction Distribution](assets/prediction_distribution.png)
 
 ---
 
@@ -242,11 +226,6 @@ Open: **http://127.0.0.1:5000**
 ## 🌐 Deployment
 
 Deployed on **Render** — [render.com](https://render.com)
-
-| File | Purpose |
-|------|---------|
-| `Procfile` | Tells Render how to start the app |
-| `requirements.txt` | All Python dependencies |
 
 Start command:
 ```
