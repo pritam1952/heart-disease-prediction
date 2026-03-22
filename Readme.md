@@ -39,7 +39,7 @@ heart-disease-prediction/
 │   │   └── result.html
 │   └── static/
 │       └── style.css
-├── assets/
+├── assests/
 │   ├── roc_curve.png
 │   ├── confusion_matrix.png
 │   └── prediction_distribution.png
@@ -149,7 +149,7 @@ Actual  No  |     29      |       3       |
 | ⚠️ False Positive (FP) | 3 | Healthy predicted as Diseased |
 | ❌ False Negative (FN) | 9 | Diseased predicted as Healthy |
 
-![Confusion Matrix](assets/confusion_matrix.png)
+![Confusion Matrix](assests/confusion_matrix.png)
 
 ---
 
@@ -157,7 +157,7 @@ Actual  No  |     29      |       3       |
 
 > AUC = 0.855 — Model has **85.5% ability** to distinguish between diseased and healthy patients.
 
-![ROC Curve](assets/roc_curve.png)
+![ROC Curve](assests/roc_curve.png)
 
 ---
 
@@ -165,7 +165,7 @@ Actual  No  |     29      |       3       |
 
 > Green = No Disease | Red = Heart Disease | Threshold = 0.5
 
-![Prediction Distribution](assets/prediction_distribution.png)
+![Prediction Distribution](assests/prediction_distribution.png)
 
 ---
 
