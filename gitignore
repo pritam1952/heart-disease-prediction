@@ -1,0 +1,33 @@
+# Virtual Environment
+ml_env/
+venv/
+env/
+.venv/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Jupyter
+.ipynb_checkpoints/
+notebooks/.ipynb_checkpoints/
+
+# Training data — not needed on server
+results/X_train.npy
+results/X_test.npy
+results/y_train.npy
+results/y_test.npy
+results/feature_names.csv
+
+# Keep these — needed for prediction
+# results/best_model.keras
+# results/scaler.pkl
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Environment variables
+.env

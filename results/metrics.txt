@@ -1,0 +1,20 @@
+=============================================
+        MODEL EVALUATION RESULTS
+=============================================
+  Accuracy  : 80.00%
+  Precision : 86.36%
+  Recall    : 67.86%
+  F1 Score  : 76.00%
+  AUC-ROC   : 85.49%
+=============================================
+
+Classification Report:
+               precision    recall  f1-score   support
+
+   No Disease       0.76      0.91      0.83        32
+Heart Disease       0.86      0.68      0.76        28
+
+     accuracy                           0.80        60
+    macro avg       0.81      0.79      0.79        60
+ weighted avg       0.81      0.80      0.80        60
+

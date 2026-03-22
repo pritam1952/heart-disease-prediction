@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prediction Result</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<div class="card">
+    <div class="header">
+        <div class="icon">{{ '🚨' if result.prediction == 1 else '✅' }}</div>
+        <h1>Prediction Result</h1>
+    </div>
+
+    <div class="result-box {{ 'danger' if result.prediction == 1 else 'safe' }}">
+        <div class="result-label">{{ result.label }}</div>
+        <div class="result-prob">{{ result.probability }}% probability</div>
+        <div class="result-risk">{{ result.risk }}</div>
+    </div>
+
+    <div class="progress-wrap">
+        <div class="progress-label">
+            <span>Risk Level</span>
+            <span>{{ result.probability }}%</span>
+        </div>
+        <div class="progress-bar">
+            <div class="progress-fill {{ 'danger' if result.prediction == 1 else 'safe' }}"
+                 style="width: {{ result.probability }}%">
+            </div>
+        </div>
+    </div>
+
+    <div class="section-title" style="margin-top: 28px;">Patient Summary</div>
+    <div class="summary-grid">
+        <div class="summary-item">
+            <span class="s-label">Age</span>
+            <span class="s-value">{{ form.age }}</span>
+        </div>
+        <div class="summary-item">
+            <span class="s-label">Sex</span>
+            <span class="s-value">{{ 'Male' if form.sex == '1' else 'Female' }}</span>
+        </div>
+        <div class="summary-item">
+            <span class="s-label">Blood Pressure</span>
+            <span class="s-value">{{ form.trestbps }} mm Hg</span>
+        </div>
+        <div class="summary-item">
+            <span class="s-label">Cholesterol</span>
+            <span class="s-value">{{ form.chol }} mg/dl</span>
+        </div>
+        <div class="summary-item">
+            <span class="s-label">Max Heart Rate</span>
+            <span class="s-value">{{ form.thalach }} bpm</span>
+        </div>
+        <div class="summary-item">
+            <span class="s-label">ST Depression</span>
+            <span class="s-value">{{ form.oldpeak }}</span>
+        </div>
+    </div>
+
+    <div class="disclaimer">
+        ⚠️ This prediction is for educational purposes only.
+        Please consult a doctor for medical advice.
+    </div>
+
+    <a href="/" class="back-btn">← Predict Again</a>
+</div>
+</body>
+</html>
